@@ -6,9 +6,10 @@ db = None
 
 async def connect_to_mongo():
     global client, db
-    client = AsyncIOMotorClient(settings.MONGODB_URI)
+    uri = settings.MONGO_URI or settings.MONGODB_URI
+    client = AsyncIOMotorClient(uri)
     db = client[settings.DB_NAME]
-    print(f"Connected to MongoDB at {settings.MONGODB_URI}")
+    print(f"Connected to MongoDB at {uri}")
 
 async def close_mongo_connection():
     global client
