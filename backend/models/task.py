@@ -10,6 +10,7 @@ class TaskBase(BaseModel):
     leetcode_link: Optional[str] = None
     leetcode_number: Optional[int] = None
     type: str = "learning" # learning, practice, revision
+    pattern: Optional[str] = None
 
 class TaskInDB(TaskBase):
     id: str = Field(alias="_id")

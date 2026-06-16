@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api';
-import { Flame, Target, CalendarClock, ChevronRight, CheckCircle2, Circle, FileText, Undo2 } from 'lucide-react';
+import { Flame, Target, CalendarClock, ChevronRight, ChevronLeft, CheckCircle2, Circle, FileText, Undo2 } from 'lucide-react';
 import { format } from 'date-fns';
 import NotesModal from '../components/NotesModal';
 
 const Dashboard = () => {
   const [data, setData] = useState(null);
   const [todayTasks, setTodayTasks] = useState([]);
+  const [allTasks, setAllTasks] = useState([]);
+  const [viewDay, setViewDay] = useState(null);
   const [loading, setLoading] = useState(true);
   const [completing, setCompleting] = useState({});
   const [completedIds, setCompletedIds] = useState(new Set());
@@ -18,6 +20,12 @@ const Dashboard = () => {
     fetchDashboard();
   }, []);
 
+  useEffect(() => {
+    if (allTasks.length > 0 && viewDay !== null) {
+      setTodayTasks(allTasks.filter(t => t.day === viewDay));
+    }
+  }, [viewDay, allTasks]);
+
   const fetchDashboard = async () => {
     try {
       const [dashRes, tasksRes] = await Promise.all([
@@ -25,10 +33,15 @@ const Dashboard = () => {
         api.get('/tasks/all')
       ]);
       setData(dashRes.data);
+      setAllTasks(tasksRes.data);
       
       const currentDay = dashRes.data.current_day;
-      const filteredTasks = tasksRes.data.filter(t => t.day === currentDay);
-      setTodayTasks(filteredTasks);
+      if (viewDay === null) {
+        setViewDay(currentDay);
+      } else {
+        // If already set, useEffect will update todayTasks based on new allTasks
+        setTodayTasks(tasksRes.data.filter(t => t.day === viewDay));
+      }
       
       // Track which tasks are already completed
       setCompletedIds(new Set(dashRes.data.completed_task_ids || []));
@@ -136,10 +149,29 @@ const Dashboard = () => {
         {/* Today's Tasks */}
         <div className="lg:col-span-2 space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2 transition-colors">
-              <div className="w-2 h-8 bg-primary-500 rounded-full"></div>
-              Day {data?.current_day} Tasks
-            </h2>
+            <div className="flex items-center gap-4">
+              <h2 className="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2 transition-colors">
+                <div className="w-2 h-8 bg-primary-500 rounded-full"></div>
+                Day {viewDay} Tasks
+              </h2>
+              <div className="flex items-center gap-1 bg-slate-100 dark:bg-dark-900 rounded-lg p-1">
+                <button 
+                  onClick={() => setViewDay(prev => Math.max(1, prev - 1))}
+                  disabled={viewDay <= 1}
+                  className="p-1 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white rounded hover:bg-slate-200 dark:hover:bg-slate-800 disabled:opacity-30 disabled:hover:bg-transparent transition-all"
+                  title="Previous Day"
+                >
+                  <ChevronLeft size={18} />
+                </button>
+                <button 
+                  onClick={() => setViewDay(prev => prev + 1)}
+                  className="p-1 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white rounded hover:bg-slate-200 dark:hover:bg-slate-800 transition-all"
+                  title="Next Day"
+                >
+                  <ChevronRight size={18} />
+                </button>
+              </div>
+            </div>
             <Link to="/roadmap" className="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300 font-medium flex items-center transition-colors">
               View full roadmap <ChevronRight size={16} />
             </Link>
@@ -178,6 +210,13 @@ const Dashboard = () => {
                       </div>
                       <h3 className={`font-medium text-lg transition-colors ${isCompleted ? 'text-slate-500 dark:text-slate-400 line-through' : 'text-slate-800 dark:text-white'}`}>{task.title}</h3>
                       <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">{task.description}</p>
+                      {task.pattern && (
+                        <div className="mt-3 inline-block">
+                          <span className="text-xs px-2.5 py-1 bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 border border-indigo-500/20 rounded-md font-medium">
+                            💡 Pattern: {task.pattern}
+                          </span>
+                        </div>
+                      )}
                     </div>
                     
                     <div className="flex items-center gap-2 shrink-0">

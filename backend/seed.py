@@ -383,6 +383,52 @@ all_topics = [
     ("Phase 8 - Binary Search", phase8_binary_search, "Week 10"),
 ]
 
+def extract_pattern(title, topic_name):
+    import re
+    match = re.search(r'\((.*?)\)', title)
+    if match:
+        return match.group(1)
+    
+    title_lower = title.lower()
+    topic_lower = topic_name.lower()
+    
+    if "two pointer" in topic_lower or "3sum" in title_lower or "two sum" in title_lower or "container" in title_lower or "palindrome" in title_lower:
+        return "Two Pointers"
+    if "sliding window" in topic_lower or "longest" in title_lower or "minimum window" in title_lower or "subarray sum" in title_lower:
+        return "Sliding Window"
+    if "prefix sum" in topic_lower or "sum" in title_lower:
+        return "Prefix Sum"
+    if "fast and slow" in topic_lower or "middle of" in title_lower or "duplicate number" in title_lower or "cycle" in title_lower:
+        return "Fast & Slow Pointers"
+    if "linked list" in topic_lower or "list" in title_lower:
+        return "Linked List Traversal"
+    if "binary search" in topic_lower or "search" in title_lower or "find minimum" in title_lower or "peak" in title_lower or "bad version" in title_lower or "split array" in title_lower or "capacity" in title_lower:
+        return "Binary Search"
+    if "stack" in topic_lower or "parentheses" in title_lower or "temperature" in title_lower or "histogram" in title_lower or "calculator" in title_lower or "evaluate" in title_lower:
+        return "Monotonic Stack / Stack"
+    if "queue" in topic_lower or "deque" in topic_lower or "sliding window maximum" in title_lower:
+        return "Queue / Deque"
+    if "backtracking" in topic_lower or "subset" in title_lower or "permutation" in title_lower or "combination" in title_lower or "n-queens" in title_lower or "word search" in title_lower or "sudoku" in title_lower:
+        return "Backtracking"
+    if "tree" in topic_lower or "depth" in title_lower or "ancestor" in title_lower or "level order" in title_lower or "path sum" in title_lower or "bst" in title_lower:
+        return "Tree Traversal"
+    if "heap" in topic_lower or "top k" in title_lower or "kth" in title_lower or "closest" in title_lower or "median" in title_lower or "merge k" in title_lower:
+        return "Heap / Priority Queue"
+    if "graph" in topic_lower or "island" in title_lower or "course schedule" in title_lower or "water flow" in title_lower or "surrounded regions" in title_lower or "word ladder" in title_lower:
+        return "Graph Traversal"
+    if "dynamic programming" in topic_lower or "climbing stairs" in title_lower or "house robber" in title_lower or "coin change" in title_lower or "longest increasing" in title_lower or "word break" in title_lower or "decode ways" in title_lower:
+        return "Dynamic Programming"
+    if "greedy" in topic_lower or "jump" in title_lower or "gas station" in title_lower or "interval" in title_lower or "burst balloons" in title_lower or "hand of straights" in title_lower:
+        return "Greedy"
+    if "trie" in topic_lower or "prefix" in title_lower or "word dictionary" in title_lower:
+        return "Trie"
+    if "hashing" in topic_lower or "hash" in topic_lower or "anagram" in title_lower or "duplicate" in title_lower or "ransom note" in title_lower or "isomorphic" in title_lower or "word pattern" in title_lower:
+        return "Hashing"
+    if "array" in topic_lower or "string" in topic_lower:
+        return "Array / String Traversal"
+    
+    return "Think about optimal data structures!"
+
 tasks_data = []
 day = 1
 problem_count = 0
@@ -398,7 +444,8 @@ for topic_name, problems, week in all_topics:
             "leetcode_number": num,
             "leetcode_link": link,
             "week": week,
-            "type": "practice"
+            "type": "practice",
+            "pattern": extract_pattern(title, topic_name)
         })
         problem_count += 1
         if problem_count % 3 == 0:
